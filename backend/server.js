@@ -1,9 +1,10 @@
+require("dotenv").config(); // Loads environment variables from a .env file into process.env.
+
+const transporter = require("./utils/sendEmail");
 const express = require("express");    // Imports the Express framework for building web applications.
 const cors = require("cors");          // Imports the CORS middleware to enable Cross-Origin Resource Sharing.
 const authMiddleware = require("./middleware/authMiddleware");  // Imports the custom authentication middleware for protecting routes.
 const mongoose = require("mongoose"); // Imports the Mongoose library for interacting with MongoDB.
-require("dotenv").config(); // Loads environment variables from a .env file into process.env.
-
 const app = express(); // Creates an instance of the Express application.
 app.use(cors()); // Enables CORS for all routes, allowing requests from different origins.
 app.use(express.json()); // Middleware to parse incoming JSON requests and make the data available in req.body. 

@@ -136,9 +136,11 @@ const DAY_LABELS = {
 };
 const DAY_ORDER = Object.keys(DAY_LABELS);
 
+
 function formatDays(days) {
   if (!days) return "";
   const active = DAY_ORDER.filter((key) => days[key]);
+  
   if (active.length === 7) return "every day";
   if (active.length === 0) return "no days selected";
   return active.map((key) => DAY_LABELS[key]).join(", ");
