@@ -13,6 +13,7 @@ app.use(express.json()); // Middleware to parse incoming JSON requests and make 
 const PORT = process.env.PORT || 5000; // Sets the port for the server to listen on, defaulting to 5000 if not specified in environment variables.
 
 const authRoutes =  require("./routes/auth"); // Imports the authentication routes for handling user login and registration.
+const reportRoutes = require("./routes/report");
 const employeeRoutes = require("./routes/employee"); // Imports the employee routes for handling employee-related operations.
 const profileRoutes = require("./routes/profile"); // Imports the profile routes for handling user profile-related operations.
 const invitationRoutes = require("./routes/invitation");
@@ -20,6 +21,7 @@ const questionRoutes = require("./routes/question"); // Imports the question rou
 const settingsRoutes = require("./routes/settings"); // Imports the settings routes for configuring the daily standup send time.
 
 app.use("/api/auth", authRoutes); // Mounts the authentication routes at the /api/auth endpoint, allowing access to login and registration functionalities.
+app.use("/api/reports", reportRoutes);
 app.use("/api/employee", employeeRoutes); // Mounts the employee routes at the /api/employee endpoint, allowing access to employee-related functionalities.
 app.use("/api/profile", profileRoutes); // Mounts the profile routes at the /api/profile endpoint, allowing access to user profile-related functionalities.
 app.use("/api/invitations", invitationRoutes);

@@ -8,8 +8,8 @@ const reportSchema = new mongoose.Schema(
       required: true,
     },
 
-    reportDate: {
-      type: Date,
+    date: {
+      type: String,
       required: true,
     },
 
@@ -20,7 +20,6 @@ const reportSchema = new mongoose.Schema(
           ref: "Question",
           required: true,
         },
-
         answer: {
           type: String,
           required: true,
@@ -29,14 +28,9 @@ const reportSchema = new mongoose.Schema(
       },
     ],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-reportSchema.index(
-  { employee: 1, reportDate: 1 },
-  { unique: true }
-);
+reportSchema.index({ employee: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model("Report", reportSchema);
