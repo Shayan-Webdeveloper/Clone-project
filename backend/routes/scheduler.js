@@ -3,11 +3,13 @@
      const Settings = require("../models/Settings");
      const Question = require("../models/Question");
      const User = require("../models/User");
+     const connectDB = require("../config/db");
      const transporter = require("../utils/sendEmail");
      const router = express.Router();
 
      router.get("/send-daily-standup", async (req, res) => {
      try {
+          await connectDB();
      if (mongoose.connection.readyState !== 1) {
           return res.status(500).json({
           message: "Database is not connected",
