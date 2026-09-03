@@ -16,7 +16,9 @@
      const handleSave = async () => {
      try {
      const response = await fetch(
-     employee ? "http://localhost:5000/api/employee/me" : "http://localhost:5000/api/employee",
+     employee
+  ? `${import.meta.env.VITE_API_URL}/api/employee/me`
+  : `${import.meta.env.VITE_API_URL}/api/employee`,
      {
      method: employee ? "PUT" : "POST",
           headers: {
@@ -42,7 +44,7 @@
      useEffect(() => {
      const fetchProfile = async () => {
           try {
-          const response = await fetch("http://localhost:5000/api/profile", {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
                headers: {
                Authorization: `Bearer ${token}`,
                },
@@ -56,7 +58,7 @@
 
           setProfile(data.user);
           const employeeResponse = await fetch(
-     "http://localhost:5000/api/employee/me",
+     `${import.meta.env.VITE_API_URL}/api/employee/me`,
      {
      headers: {
           Authorization: `Bearer ${token}`,

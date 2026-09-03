@@ -14,7 +14,7 @@ function Dashboard() {
     const fetchUser = async () => {
       try {
 
-        const response = await fetch("http://localhost:5000/api/profile", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

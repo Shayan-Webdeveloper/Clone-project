@@ -15,7 +15,7 @@ const [loading, setLoading] = useState(false);
   useEffect(() => {
     const verifyInvitation = async () => {
       const response = await fetch(
-        `http://localhost:5000/api/invitations/verify/${token}`
+        `${import.meta.env.VITE_API_URL}/api/invitations/verify/${token}`
       );
 
       const data = await response.json();
@@ -71,7 +71,7 @@ console.log(data);
     e.preventDefault();
 setLoading(true);
     const response = await fetch(
-      "http://localhost:5000/api/invitations/accept",
+      `${import.meta.env.VITE_API_URL}/api/invitations/accept`,
       {
         method: "POST",
         headers: {
