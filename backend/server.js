@@ -13,6 +13,7 @@ app.use(express.json()); // Middleware to parse incoming JSON requests and make 
 const PORT = process.env.PORT || 5000; // Sets the port for the server to listen on, defaulting to 5000 if not specified in environment variables.
 
 const authRoutes =  require("./routes/auth"); // Imports the authentication routes for handling user login and registration.
+const schedulerRoutes = require("./routes/scheduler");
 const reportRoutes = require("./routes/report");
 const employeeRoutes = require("./routes/employee"); // Imports the employee routes for handling employee-related operations.
 const profileRoutes = require("./routes/profile"); // Imports the profile routes for handling user profile-related operations.
@@ -25,6 +26,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/employee", employeeRoutes); // Mounts the employee routes at the /api/employee endpoint, allowing access to employee-related functionalities.
 app.use("/api/profile", profileRoutes); // Mounts the profile routes at the /api/profile endpoint, allowing access to user profile-related functionalities.
 app.use("/api/invitations", invitationRoutes);
+app.use("/api/scheduler", schedulerRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/settings", settingsRoutes);
 app.get("/", (req, res) => { // Defines a route for the root URL ("/") that responds with a simple message indicating that the backend server is running.
