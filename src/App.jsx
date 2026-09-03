@@ -6,6 +6,7 @@ import Profile from "./pages/Profile/page";
 import AdminOverview from "./pages/admin/AdminOverview/page";
 import AdminEmployees from "./pages/admin/AdminEmployees/page";
 import AdminInvite from "./pages/admin/AdminInvite/page";
+import EmployeeReport from "./pages/EmployeeReport/page";
 import AdminQuestions from "./pages/admin/AdminQuestions/page";
 import AdminSchedule from "./pages/admin/AdminSchedule/page";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -36,6 +37,7 @@ function App() {
           element={isAdmin ? <AdminOverview /> : <Dashboard />}
         />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/report" element={<EmployeeReport />} /> 
 
         {isAdmin && (
           <>
