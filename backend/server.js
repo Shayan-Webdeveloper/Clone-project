@@ -16,6 +16,8 @@ const authRoutes =  require("./routes/auth"); // Imports the authentication rout
 const schedulerRoutes = require("./routes/scheduler");
 const reportRoutes = require("./routes/report");
 const employeeRoutes = require("./routes/employee"); // Imports the employee routes for handling employee-related operations.
+const teamRoutes = require("./routes/team");
+console.log("TEAM ROUTES LOADED");
 const profileRoutes = require("./routes/profile"); // Imports the profile routes for handling user profile-related operations.
 const invitationRoutes = require("./routes/invitation");
 const questionRoutes = require("./routes/question"); // Imports the question routes for admins to manage the daily standup questions.
@@ -24,6 +26,7 @@ const settingsRoutes = require("./routes/settings"); // Imports the settings rou
 app.use("/api/auth", authRoutes); // Mounts the authentication routes at the /api/auth endpoint, allowing access to login and registration functionalities.
 app.use("/api/reports", reportRoutes);
 app.use("/api/employee", employeeRoutes); // Mounts the employee routes at the /api/employee endpoint, allowing access to employee-related functionalities.
+app.use("/api/teams", teamRoutes);
 app.use("/api/profile", profileRoutes); // Mounts the profile routes at the /api/profile endpoint, allowing access to user profile-related functionalities.
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/scheduler", schedulerRoutes);
