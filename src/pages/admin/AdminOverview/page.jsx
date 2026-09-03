@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import { Users, UserCheck, Mail, ListChecks, Clock } from "lucide-react";
 
 const API = "http://localhost:5000/api";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { User as UserIcon, Mail, ShieldCheck, ArrowRight } from "lucide-react";
 
 function Dashboard() {
