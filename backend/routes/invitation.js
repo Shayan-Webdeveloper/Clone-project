@@ -7,6 +7,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
 const Invitation = require("../models/Invitation");
 const router = express.Router();
+const transporter = require("../utils/sendEmail");
 
 router.post(
   "/",
@@ -20,6 +21,12 @@ const invitation = await Invitation.create({
   token,
   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
   invitedBy: req.user.id,
+});
+await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: email,
+  subject: "You're invited to join Team Pulse",
+  text: `You have been invited to join Team Pulse. Click this link to accept your invitation: http://localhost:5173/accept-invitation?token=${token}`,
 });
     res.status(201).json({
   message: "Invitation created successfully",

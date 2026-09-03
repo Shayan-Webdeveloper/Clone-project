@@ -1,4 +1,5 @@
-require("dotenv").config(); // Loads environment variables from a .env file into process.env.
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const transporter = require("./utils/sendEmail");
 const express = require("express");    // Imports the Express framework for building web applications.
