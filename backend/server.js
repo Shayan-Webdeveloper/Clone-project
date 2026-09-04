@@ -41,8 +41,7 @@ app.get("/api/protected", authMiddleware, (req, res) => {
     user: req.user,
   });
 });
-mongoose
-  .connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB connected successfully");
 
