@@ -41,7 +41,10 @@ app.get("/api/protected", authMiddleware, (req, res) => {
     user: req.user,
   });
 });
-console.log("MONGODB_URI EXISTS:", !!process.env.MONGODB_URI);
+console.log("========== ENV CHECK ==========");
+console.log("MONGODB_URI:", process.env.MONGODB_URI ? "FOUND" : "MISSING");
+console.log("JWT_SECRET:", process.env.JWT_SECRET ? "FOUND" : "MISSING");
+console.log("================================");
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB connected successfully");
