@@ -30,7 +30,7 @@ useEffect(() => {
 
   const toggleStatus = async (employeeId, nextActive) => {
     try {
-      const response = await fetch(`${API}/employee/${employeeId}/status`, {
+      const response = await fetch(`${API}/employee/${selectedTeam.teamId}/${employeeId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
