@@ -2,6 +2,7 @@
   const authMiddleware = require("../middleware/authMiddleware");
   const Team = require("../models/Team");
   const TeamMember = require("../models/TeamMember");
+  const requireTeamRole = require("../middleware/teamRoleMiddleware");
 
   const router = express.Router();
   router.get("/", authMiddleware, async (req, res) => {
@@ -55,5 +56,4 @@
       });
     }
   });
-
   module.exports = router;

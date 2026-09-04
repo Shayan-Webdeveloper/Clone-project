@@ -1,16 +1,22 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
-const adminMiddleware = require("../middleware/adminMiddleware");     
+const requireTeamRole = require("../middleware/teamRoleMiddleware");
 const Employee = require("../models/Employee");
 
 const router = express.Router();
-router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
+router.post(
+  "/:teamId",
+  authMiddleware,
+  requireTeamRole("admin"),
+  async (req, res) => {
   try {
     const { department, position, phone, joiningDate } = req.body;
+const { teamId } = req.params;
 
-    const existingEmployee = await Employee.findOne({
-      user: req.user.id,
-    });
+const existingEmployee = await Employee.findOne({
+  team: teamId,
+  user: req.user.id,
+});
 
     if (existingEmployee) {
       return res.status(409).json({
@@ -19,13 +25,13 @@ router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
     }
 
     const employee = await Employee.create({
-      user: req.user.id,
-      department,
-      position,
-      phone,
-      joiningDate,
-    });
-
+  team: teamId,
+  user: req.user.id,
+  department,
+  position,
+  phone,
+  joiningDate,
+});
     res.status(201).json({
       message: "Employee profile created successfully",
       employee,
@@ -36,12 +42,13 @@ router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
     });
   }
 });
-router.put("/me", authMiddleware, async (req, res) => {
+router.put("/:teamId/me", authMiddleware, async (req, res) => {
   try {
+    const { teamId } = req.params;
     const { department, position, phone, joiningDate } = req.body;
 
-    const employee = await Employee.findOneAndUpdate(
-      { user: req.user.id },
+const employee = await Employee.findOneAndUpdate(
+  { team: teamId, user: req.user.id },
       {
         department,
         position,
@@ -67,9 +74,14 @@ router.put("/me", authMiddleware, async (req, res) => {
     });
   }
 });
-router.get("/me", authMiddleware, async (req, res) => {
+router.get("/:teamId/me", authMiddleware, async (req, res) => {
   try {
-    const employee = await Employee.findOne({ user: req.user.id }).populate(
+    const { teamId } = req.params;
+
+const employee = await Employee.findOne({
+  team: teamId,
+  user: req.user.id,
+}).populate(
       "user",
       "name email role"
     );
@@ -91,9 +103,13 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
-router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
+router.get("/:teamId", authMiddleware, requireTeamRole("admin"), async (req, res) => {
   try {
-    const employees = await Employee.find()
+    const { teamId } = req.params;
+
+const employees = await Employee.find({
+  team: teamId,
+})
       .populate("user", "name email role isActive createdAt")
       .sort({ createdAt: -1 });
 
@@ -108,11 +124,19 @@ router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-router.put("/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
+router.put(
+  "/:teamId/:id/status",
+  authMiddleware,
+  requireTeamRole("admin"),
+  async (req, res) => {
   try {
     const { isActive } = req.body;
+const { teamId } = req.params;
 
-    const employee = await Employee.findById(req.params.id).populate("user");
+    const employee = await Employee.findOne({
+  _id: req.params.id,
+  team: teamId,
+}).populate("user");
 
     if (!employee) {
       return res.status(404).json({

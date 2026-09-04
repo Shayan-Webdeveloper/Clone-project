@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -25,9 +26,53 @@ const EMPLOYEE_LINKS = [
 ];
 
 function Sidebar() {
-  const { user, logout } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { user, selectedTeam, selectTeam, token, logout } = useAuth();
+  const [teams, setTeams] = useState([]);
+  const isAdmin = user?.role === "admin" || selectedTeam?.role === "admin";
   const links = isAdmin ? ADMIN_LINKS : EMPLOYEE_LINKS;
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      if (!token) {
+        setTeams([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/teams`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        const nextTeams = data.teams || [];
+
+        setTeams(nextTeams);
+
+        if (nextTeams.length === 0) {
+          if (selectedTeam) selectTeam(null);
+          return;
+        }
+
+        const hasSelectedTeam = nextTeams.some(
+          (team) => team.teamId === selectedTeam?.teamId
+        );
+
+        if (!hasSelectedTeam) {
+          selectTeam(nextTeams[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch teams:", error);
+        setTeams([]);
+      }
+    };
+
+    fetchTeams();
+  }, [token, selectedTeam?.teamId, selectTeam]);
 
   return (
     <aside className="w-64 shrink-0 bg-white border-r border-slate-200 min-h-screen flex flex-col">
@@ -43,6 +88,20 @@ function Sidebar() {
           <p className="text-xs text-slate-400 leading-tight">
             {isAdmin ? "Admin" : "Employee"}
           </p>
+          <select
+  value={selectedTeam?.teamId || ""}
+  onChange={(e) => {
+    const team = teams.find((t) => t.teamId === e.target.value);
+    if (team) selectTeam(team);
+  }}
+  className="mt-2 w-full text-xs border border-slate-200 rounded-lg px-2 py-1"
+>
+  {teams.map((team) => (
+    <option key={team.teamId} value={team.teamId}>
+      {team.name}
+    </option>
+  ))}
+</select>
         </div>
       </div>
 

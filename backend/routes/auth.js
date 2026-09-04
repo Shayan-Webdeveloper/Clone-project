@@ -49,6 +49,7 @@
      });
      router.post("/login", async (req, res) => {
      try {
+          console.log("LOGIN ROUTE STARTED");
      const { email, password } = req.body;
 
      if (!email || !password) {

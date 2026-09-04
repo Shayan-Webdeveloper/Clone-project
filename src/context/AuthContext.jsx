@@ -8,10 +8,16 @@ export const AuthProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
+  const [selectedTeam, setSelectedTeam] = useState(
+    JSON.parse(localStorage.getItem("selectedTeam")) || null
+  );
+
   const login = (token, user) => {
+    localStorage.removeItem("selectedTeam");
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
 
+    setSelectedTeam(null);
     setToken(token);
     setUser(user);
   };
@@ -19,9 +25,22 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("selectedTeam");
 
     setToken(null);
     setUser(null);
+    setSelectedTeam(null);
+  };
+
+  const selectTeam = (team) => {
+    if (!team) {
+      localStorage.removeItem("selectedTeam");
+      setSelectedTeam(null);
+      return;
+    }
+
+    localStorage.setItem("selectedTeam", JSON.stringify(team));
+    setSelectedTeam(team);
   };
 
   return (
@@ -29,6 +48,9 @@ export const AuthProvider = ({ children }) => {
       value={{
         token,
         user,
+        selectedTeam,
+        setSelectedTeam,
+        selectTeam,
         login,
         logout,
         isAuthenticated: !!token,
