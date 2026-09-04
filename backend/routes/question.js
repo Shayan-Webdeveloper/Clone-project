@@ -1,9 +1,19 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
+const globalAdminMiddleware = require("../middleware/globalAdminMiddleware");
 const Question = require("../models/Question");
 
 const router = express.Router();
+
+router.get("/", authMiddleware, globalAdminMiddleware, async (req, res) => {
+  try {
+    const questions = await Question.find().sort({ createdAt: -1 });
+    res.json({ message: "Questions fetched successfully", questions });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Admin: list every question (active and inactive)
 router.get("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {

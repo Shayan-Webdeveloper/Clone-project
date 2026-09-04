@@ -6,6 +6,7 @@ const express = require("express");
 const crypto = require("crypto");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
+const globalAdminMiddleware = require("../middleware/globalAdminMiddleware");
 const Invitation = require("../models/Invitation");
 const router = express.Router();
 const transporter = require("../utils/sendEmail");
@@ -124,7 +125,7 @@ await invitation.save();
     });
   }
 });
-router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
+router.get("/", authMiddleware, globalAdminMiddleware, async (req, res) => {
   try {
     const invitations = await Invitation.find().sort({ createdAt: -1 });
 

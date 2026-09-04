@@ -1,6 +1,6 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
-const adminMiddleware = require("../middleware/adminMiddleware");
+const globalAdminMiddleware = require("../middleware/globalAdminMiddleware");
 const Settings = require("../models/Settings");
 
 const router = express.Router();
@@ -15,7 +15,7 @@ const DAY_KEYS = [
   "saturday",
 ];
 
-router.get("/schedule", authMiddleware, adminMiddleware, async (req, res) => {
+router.get("/schedule", authMiddleware, globalAdminMiddleware, async (req, res) => {
   try {
     let settings = await Settings.findOne({ key: "standup" });
 
@@ -36,7 +36,7 @@ router.get("/schedule", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-router.put("/schedule", authMiddleware, adminMiddleware, async (req, res) => {
+router.put("/schedule", authMiddleware, globalAdminMiddleware, async (req, res) => {
   try {
     const { dailyTime, days } = req.body;
 
