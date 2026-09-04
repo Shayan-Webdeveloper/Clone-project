@@ -15,6 +15,7 @@ function AdminInvite() {
   const [invitations, setInvitations] = useState(null);
 
   const fetchInvitations = async () => {
+    if (!selectedTeam) return;
     try {
       const response = await fetch(`${API}/invitations/${selectedTeam.teamId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -29,10 +30,11 @@ function AdminInvite() {
 
   useEffect(() => {
     fetchInvitations();
-  }, []);
+  }, [selectedTeam]);
 
   const handleInvite = async (e) => {
     e.preventDefault();
+    if (!selectedTeam) return;
     setLoading(true);
     setError("");
     setNewLink("");
