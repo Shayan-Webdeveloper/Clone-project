@@ -5,7 +5,7 @@ import { Copy, Check } from "lucide-react";
 const API = `${import.meta.env.VITE_API_URL}/api`;
 
 function AdminInvite() {
-  const { token } = useAuth();
+  const { token, selectedTeam } = useAuth();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +43,10 @@ function AdminInvite() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+  email,
+  teamId: selectedTeam.teamId,
+}),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
