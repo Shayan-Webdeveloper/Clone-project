@@ -5,10 +5,20 @@ const transporter = require("./utils/sendEmail");
 const express = require("express");    // Imports the Express framework for building web applications.
 const cors = require("cors");          // Imports the CORS middleware to enable Cross-Origin Resource Sharing.
 const authMiddleware = require("./middleware/authMiddleware");  // Imports the custom authentication middleware for protecting routes.
-const mongoose = require("mongoose"); // Imports the Mongoose library for interacting with MongoDB.
+const mongoose = require("mongoose");
+const connectDB = require("./config/db");
 const app = express(); // Creates an instance of the Express application.
 app.use(cors()); // Enables CORS for all routes, allowing requests from different origins.
-app.use(express.json()); // Middleware to parse incoming JSON requests and make the data available in req.body. 
+app.use(express.json());
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    res.status(503).json({ message: "Database connection failed" });
+  }
+}); // Middleware to parse incoming JSON requests and make the data available in req.body. 
 
 const PORT = process.env.PORT || 5000; // Sets the port for the server to listen on, defaulting to 5000 if not specified in environment variables.
 
@@ -52,17 +62,13 @@ mongoose.connection.on("connected", () => {
 mongoose.connection.on("error", (error) => {
   console.error("========== MONGODB ERROR ==========", error.message);
 });
-mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-})
-  .then(() => {
-    console.log("MongoDB connected successfully");
 
+if (require.main === module) {
+  connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error("MongoDB connection failed:", error.message);
   });
+}
+
 module.exports = app;
