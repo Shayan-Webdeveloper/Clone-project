@@ -14,11 +14,13 @@ router.post(
   authMiddleware,
   adminMiddleware,
   async (req, res) => {
-    const { email } = req.body;
     const token = crypto.randomBytes(32).toString("hex");
+const { email, teamId } = req.body;
+
 const invitation = await Invitation.create({
   email,
   token,
+  team: teamId,
   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
   invitedBy: req.user.id,
 });
@@ -101,6 +103,7 @@ const user = await User.create({
 });
 await Employee.create({
   user: user._id,
+  team: invitation.team,
 });
 invitation.status = "accepted";
 await invitation.save();
