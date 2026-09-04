@@ -6,7 +6,7 @@ const Question = require("../models/Question");
 const router = express.Router();
 
 // Admin: list every question (active and inactive)
-router.get("/", authMiddleware, adminMiddleware, async (req, res) => {
+router.get("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const questions = await Question.find().sort({ createdAt: -1 });
 
@@ -39,7 +39,7 @@ router.get("/active", authMiddleware, async (req, res) => {
   }
 });
 
-router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
+router.post("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { questionText } = req.body;
 
@@ -62,7 +62,7 @@ router.post("/", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
+router.put("/:teamId/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { questionText, isActive } = req.body;
 
@@ -92,7 +92,7 @@ router.put("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
+router.delete("/:teamId/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const question = await Question.findByIdAndDelete(req.params.id);
 

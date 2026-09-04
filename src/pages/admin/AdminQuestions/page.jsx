@@ -5,7 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 const API = `${import.meta.env.VITE_API_URL}/api`;
 
 function AdminQuestions() {
-  const { token } = useAuth();
+  const { token, selectedTeam } = useAuth();
   const [questions, setQuestions] = useState(null);
   const [newQuestion, setNewQuestion] = useState("");
   const [error, setError] = useState("");
@@ -13,7 +13,7 @@ function AdminQuestions() {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`${API}/questions`, {
+      const response = await fetch(`${API}/questions/${selectedTeam.teamId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -24,9 +24,11 @@ function AdminQuestions() {
     }
   };
 
-  useEffect(() => {
+useEffect(() => {
+  if (token && selectedTeam?.teamId) {
     fetchQuestions();
-  }, []);
+  }
+}, [token, selectedTeam?.teamId]);
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -34,7 +36,7 @@ function AdminQuestions() {
     setAdding(true);
     setError("");
     try {
-      const response = await fetch(`${API}/questions`, {
+      const response = await fetch(`${API}/questions/${selectedTeam.teamId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +57,7 @@ function AdminQuestions() {
 
   const toggleActive = async (id, isActive) => {
     try {
-      const response = await fetch(`${API}/questions/${id}`, {
+      const response = await fetch(`${API}/questions/${selectedTeam.teamId}/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +77,7 @@ function AdminQuestions() {
 
   const removeQuestion = async (id) => {
     try {
-      const response = await fetch(`${API}/questions/${id}`, {
+      const response = await fetch(`${API}/questions/${selectedTeam.teamId}/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

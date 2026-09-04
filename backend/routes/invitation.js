@@ -1,3 +1,4 @@
+const TeamMember = require("../models/TeamMember");
 const Employee = require("../models/Employee");   
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
@@ -10,12 +11,13 @@ const router = express.Router();
 const transporter = require("../utils/sendEmail");
 
 router.post(
-  "/",
+  "/:teamId",
   authMiddleware,
   adminMiddleware,
   async (req, res) => {
     const token = crypto.randomBytes(32).toString("hex");
-const { email, teamId } = req.body;
+const { email } = req.body;
+const { teamId } = req.params;
 
 const invitation = await Invitation.create({
   email,
@@ -104,6 +106,12 @@ const user = await User.create({
 await Employee.create({
   user: user._id,
   team: invitation.team,
+});
+await TeamMember.create({
+  user: user._id,
+  team: invitation.team,
+  role: "employee",
+  status: "active",
 });
 invitation.status = "accepted";
 await invitation.save();

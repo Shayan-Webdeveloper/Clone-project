@@ -15,7 +15,7 @@ function AdminInvite() {
 
   const fetchInvitations = async () => {
     try {
-      const response = await fetch(`${API}/invitations`, {
+      const response = await fetch(`${API}/invitations/${selectedTeam.teamId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -37,7 +37,7 @@ function AdminInvite() {
     setNewLink("");
     setCopied(false);
     try {
-      const response = await fetch(`${API}/invitations`, {
+      const response = await fetch(`${API}/invitations/${selectedTeam.teamId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
