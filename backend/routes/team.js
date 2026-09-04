@@ -13,11 +13,13 @@
       }).populate("team", "name");
 
       res.json({
-        teams: memberships.map((membership) => ({
-          teamId: membership.team._id,
-          name: membership.team.name,
-          role: membership.role,
-        })),
+        teams: memberships
+          .filter((membership) => membership.team)
+          .map((membership) => ({
+            teamId: membership.team._id,
+            name: membership.team.name,
+            role: membership.role,
+          })),
       });
     } catch (error) {
       res.status(500).json({

@@ -3,7 +3,7 @@
       import { Pencil, Briefcase, Phone, CalendarDays, Building2 } from "lucide-react";
 
       function Profile() {
-      const { token } = useAuth();
+      const { token, selectedTeam } = useAuth();
       const [profile, setProfile] = useState(null);
       const [employee, setEmployee] = useState(null);
       const [isEditing, setIsEditing] = useState(false);     
@@ -17,8 +17,8 @@
       try {
       const response = await fetch(
       employee
-    ? `${import.meta.env.VITE_API_URL}/api/employee/me`
-    : `${import.meta.env.VITE_API_URL}/api/employee`,
+    ? `${import.meta.env.VITE_API_URL}/api/employee/${selectedTeam?.teamId}/me`
+    : `${import.meta.env.VITE_API_URL}/api/employee/${selectedTeam?.teamId}`,
       {
       method: employee ? "PUT" : "POST",
             headers: {
@@ -58,7 +58,7 @@
 
             setProfile(data.user);
             const employeeResponse = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/employee/me`,
+      `${import.meta.env.VITE_API_URL}/api/employee/${selectedTeam?.teamId}/me`,
       {
       headers: {
             Authorization: `Bearer ${token}`,
@@ -91,8 +91,8 @@
             }
       };
 
-      fetchProfile();
-      }, [token]);
+      if (selectedTeam) fetchProfile();
+      }, [token, selectedTeam]);
 
       if (!profile) {
       return (
