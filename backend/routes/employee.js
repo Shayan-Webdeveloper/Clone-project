@@ -2,6 +2,7 @@
   const authMiddleware = require("../middleware/authMiddleware");
   const requireTeamRole = require("../middleware/teamRoleMiddleware");
   const Employee = require("../models/Employee");
+  const TeamMember = require("../models/TeamMember");
 
   const router = express.Router();
   router.post(
@@ -107,11 +108,20 @@
     try {
       const { teamId } = req.params;
 
-  const employees = await Employee.find({
+  const adminMemberships = await TeamMember.find({
     team: teamId,
-  })
-        .populate("user", "name email role isActive createdAt")
-        .sort({ createdAt: -1 });
+    role: "admin",
+  }).select("user");
+
+  const adminUserIds = adminMemberships.map((m) => m.user.toString());
+
+  const employees = (
+    await Employee.find({
+      team: teamId,
+    })
+      .populate("user", "name email role isActive createdAt")
+      .sort({ createdAt: -1 })
+  ).filter((employee) => !adminUserIds.includes(employee.user?._id?.toString()));
 
       res.json({
         message: "Employees fetched successfully",
