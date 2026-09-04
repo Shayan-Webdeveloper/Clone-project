@@ -28,51 +28,93 @@ const EMPLOYEE_LINKS = [
 function Sidebar() {
   const { user, selectedTeam, selectTeam, token, logout } = useAuth();
   const [teams, setTeams] = useState([]);
+  const [isCreatingTeam, setIsCreatingTeam] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
+  const [creatingTeam, setCreatingTeam] = useState(false);
+  const [createTeamError, setCreateTeamError] = useState("");
   const isAdmin = user?.role === "admin" || selectedTeam?.role === "admin";
   const links = isAdmin ? ADMIN_LINKS : EMPLOYEE_LINKS;
 
-  useEffect(() => {
-    const fetchTeams = async () => {
-      if (!token) {
-        setTeams([]);
+  const fetchTeams = async (teamToSelect) => {
+    if (!token) {
+      setTeams([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/teams`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      const nextTeams = data.teams || [];
+
+      setTeams(nextTeams);
+
+      if (nextTeams.length === 0) {
+        if (selectedTeam) selectTeam(null);
         return;
       }
 
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/teams`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-        const nextTeams = data.teams || [];
-
-        setTeams(nextTeams);
-
-        if (nextTeams.length === 0) {
-          if (selectedTeam) selectTeam(null);
+      if (teamToSelect) {
+        const matched = nextTeams.find((team) => team.teamId === teamToSelect);
+        if (matched) {
+          selectTeam(matched);
           return;
         }
-
-        const hasSelectedTeam = nextTeams.some(
-          (team) => team.teamId === selectedTeam?.teamId
-        );
-
-        if (!hasSelectedTeam) {
-          selectTeam(nextTeams[0]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch teams:", error);
-        setTeams([]);
       }
-    };
 
+      const hasSelectedTeam = nextTeams.some(
+        (team) => team.teamId === selectedTeam?.teamId
+      );
+
+      if (!hasSelectedTeam) {
+        selectTeam(nextTeams[0]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch teams:", error);
+      setTeams([]);
+    }
+  };
+
+  useEffect(() => {
     fetchTeams();
-  }, [token, selectedTeam?.teamId, selectTeam]);
+  }, [token]);
+
+  const handleCreateTeam = async (e) => {
+    e.preventDefault();
+    if (!newTeamName.trim()) return;
+    setCreatingTeam(true);
+    setCreateTeamError("");
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/teams`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: newTeamName.trim() }),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      await fetchTeams(data.team._id);
+      setNewTeamName("");
+      setIsCreatingTeam(false);
+    } catch (error) {
+      setCreateTeamError(error.message || "Unable to create team");
+    } finally {
+      setCreatingTeam(false);
+    }
+  };
 
   return (
     <aside className="w-64 shrink-0 bg-white border-r border-slate-200 min-h-screen flex flex-col">
@@ -102,6 +144,49 @@ function Sidebar() {
     </option>
   ))}
 </select>
+
+{isCreatingTeam ? (
+  <form onSubmit={handleCreateTeam} className="mt-2 space-y-1.5">
+    <input
+      type="text"
+      autoFocus
+      placeholder="Team name"
+      value={newTeamName}
+      onChange={(e) => setNewTeamName(e.target.value)}
+      className="w-full text-xs border border-slate-200 rounded-lg px-2 py-1"
+    />
+    {createTeamError && (
+      <p className="text-[11px] text-red-600">{createTeamError}</p>
+    )}
+    <div className="flex gap-1.5">
+      <button
+        type="submit"
+        disabled={creatingTeam}
+        className="flex-1 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-1 cursor-pointer"
+      >
+        {creatingTeam ? "Creating..." : "Create"}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setIsCreatingTeam(false);
+          setNewTeamName("");
+          setCreateTeamError("");
+        }}
+        className="flex-1 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg py-1 cursor-pointer"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+) : (
+  <button
+    onClick={() => setIsCreatingTeam(true)}
+    className="mt-1.5 w-full text-xs font-medium text-indigo-600 hover:text-indigo-700 text-left cursor-pointer"
+  >
+    + Create team
+  </button>
+)}
         </div>
       </div>
 
