@@ -11,67 +11,6 @@ const Invitation = require("../models/Invitation");
 const router = express.Router();
 const transporter = require("../utils/sendEmail");
 
-router.post(
-  "/:teamId",
-  authMiddleware,
-  adminMiddleware,
-  async (req, res) => {
-    const token = crypto.randomBytes(32).toString("hex");
-const { email, role } = req.body;
-const { teamId } = req.params;
-
-const invitation = await Invitation.create({
-  email,
-  token,
-  team: teamId,
-  role: role === "admin" ? "admin" : "employee",
-  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  invitedBy: req.user.id,
-});
-const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
-const invitationLink = `${frontendUrl}/accept-invitation?token=${token}`;
-
-await transporter.sendMail({
-  from: process.env.EMAIL_USER,
-  to: email,
-  subject: "You're invited to join Team Pulse",
-  text: `You have been invited to join Team Pulse. Click this link to accept your invitation: ${invitationLink}`,
-});
-    res.status(201).json({
-  message: "Invitation created successfully",
-  invitation,
-  invitationLink,
-});
-  }
-);
-router.get("/verify/:token", async (req, res) => {
-  const { token } = req.params;
-
-  const invitation = await Invitation.findOne({ token });
-
-  if (!invitation) {
-    return res.status(404).json({
-      message: "Invalid invitation",
-    });
-  }
-
-  if (invitation.status !== "pending") {
-    return res.status(400).json({
-      message: "Invitation is no longer valid",
-    });
-  }
-
-  if (invitation.expiresAt < new Date()) {
-    return res.status(400).json({
-      message: "Invitation has expired",
-    });
-  }
-
-  res.json({
-    message: "Invitation is valid",
-    email: invitation.email,
-  });
-});
 router.post("/accept", async (req, res) => {
   try {
     const { name, token, password } = req.body;
@@ -151,6 +90,67 @@ await invitation.save();
       message: error.message,
     });
   }
+});
+router.post(
+  "/:teamId",
+  authMiddleware,
+  adminMiddleware,
+  async (req, res) => {
+    const token = crypto.randomBytes(32).toString("hex");
+const { email, role } = req.body;
+const { teamId } = req.params;
+
+const invitation = await Invitation.create({
+  email,
+  token,
+  team: teamId,
+  role: role === "admin" ? "admin" : "employee",
+  expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  invitedBy: req.user.id,
+});
+const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+const invitationLink = `${frontendUrl}/accept-invitation?token=${token}`;
+
+await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: email,
+  subject: "You're invited to join Team Pulse",
+  text: `You have been invited to join Team Pulse. Click this link to accept your invitation: ${invitationLink}`,
+});
+    res.status(201).json({
+  message: "Invitation created successfully",
+  invitation,
+  invitationLink,
+});
+  }
+);
+router.get("/verify/:token", async (req, res) => {
+  const { token } = req.params;
+
+  const invitation = await Invitation.findOne({ token });
+
+  if (!invitation) {
+    return res.status(404).json({
+      message: "Invalid invitation",
+    });
+  }
+
+  if (invitation.status !== "pending") {
+    return res.status(400).json({
+      message: "Invitation is no longer valid",
+    });
+  }
+
+  if (invitation.expiresAt < new Date()) {
+    return res.status(400).json({
+      message: "Invitation has expired",
+    });
+  }
+
+  res.json({
+    message: "Invitation is valid",
+    email: invitation.email,
+  });
 });
 router.get("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
   try {
