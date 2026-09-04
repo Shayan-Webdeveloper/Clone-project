@@ -45,7 +45,9 @@ console.log("========== ENV CHECK ==========");
 console.log("MONGODB_URI:", process.env.MONGODB_URI ? "FOUND" : "MISSING");
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "FOUND" : "MISSING");
 console.log("================================");
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGODB_URI, {
+  serverSelectionTimeoutMS: 5000,
+})
   .then(() => {
     console.log("MongoDB connected successfully");
 
