@@ -17,13 +17,14 @@ router.post(
   adminMiddleware,
   async (req, res) => {
     const token = crypto.randomBytes(32).toString("hex");
-const { email } = req.body;
+const { email, role } = req.body;
 const { teamId } = req.params;
 
 const invitation = await Invitation.create({
   email,
   token,
   team: teamId,
+  role: role === "admin" ? "admin" : "employee",
   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
   invitedBy: req.user.id,
 });
@@ -72,9 +73,9 @@ router.post("/accept", async (req, res) => {
   try {
     const { name, token, password } = req.body;
 
-    if (!name || !token || !password) {
+    if (!token) {
       return res.status(400).json({
-        message: "Name, token and password are required",
+        message: "Token is required",
       });
     }
 
@@ -97,13 +98,36 @@ router.post("/accept", async (req, res) => {
         message: "Invitation has expired",
       });
     }
-const hashedPassword = await bcrypt.hash(password, 10);
-const user = await User.create({
-  name,
-  email: invitation.email,
-  password: hashedPassword,
-  role: "employee",
+
+let user = await User.findOne({ email: invitation.email });
+
+if (!user && (!name || !password)) {
+  return res.status(400).json({
+    message: "Name and password are required for a new account",
+  });
+}
+
+if (!user) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user = await User.create({
+    name,
+    email: invitation.email,
+    password: hashedPassword,
+    role: "employee",
+  });
+}
+
+const existingMembership = await TeamMember.findOne({
+  user: user._id,
+  team: invitation.team,
 });
+
+if (existingMembership) {
+  return res.status(409).json({
+    message: "You're already a member of this team",
+  });
+}
+
 await Employee.create({
   user: user._id,
   team: invitation.team,
@@ -111,7 +135,7 @@ await Employee.create({
 await TeamMember.create({
   user: user._id,
   team: invitation.team,
-  role: "employee",
+  role: invitation.role,
   status: "active",
 });
 invitation.status = "accepted";
@@ -125,6 +149,23 @@ await invitation.save();
     });
   }
 });
+router.get("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const invitations = await Invitation.find({ team: req.params.teamId }).sort({
+      createdAt: -1,
+    });
+
+    res.json({
+      message: "Invitations fetched successfully",
+      invitations,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
 router.get("/", authMiddleware, globalAdminMiddleware, async (req, res) => {
   try {
     const invitations = await Invitation.find().sort({ createdAt: -1 });

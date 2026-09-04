@@ -7,6 +7,7 @@ const API = `${import.meta.env.VITE_API_URL}/api`;
 function AdminInvite() {
   const { token, selectedTeam } = useAuth();
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState("employee");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [newLink, setNewLink] = useState("");
@@ -45,6 +46,7 @@ function AdminInvite() {
         },
         body: JSON.stringify({
   email,
+  role,
   teamId: selectedTeam.teamId,
 }),
       });
@@ -52,6 +54,7 @@ function AdminInvite() {
       if (!response.ok) throw new Error(data.message);
       setNewLink(data.invitationLink);
       setEmail("");
+      setRole("employee");
       fetchInvitations();
     } catch (err) {
       setError(err.message || "Unable to send invitation");
@@ -95,6 +98,20 @@ function AdminInvite() {
                 required
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="employee">Employee</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
 
             {error && (
@@ -152,7 +169,10 @@ function AdminInvite() {
                   className="py-3 flex items-center justify-between gap-3"
                 >
                   <span className="text-sm text-slate-700 truncate">
-                    {inv.email}
+                    {inv.email}{" "}
+                    <span className="text-slate-400 capitalize">
+                      ({inv.role})
+                    </span>
                   </span>
                   <span
                     className={`text-xs font-semibold px-2.5 py-1 rounded-full shrink-0 capitalize ${

@@ -25,6 +25,12 @@ const invitationSchema = new mongoose.Schema(
       default: "pending",
     },
 
+    role: {
+      type: String,
+      enum: ["admin", "employee"],
+      default: "employee",
+    },
+
     invitedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
