@@ -28,16 +28,19 @@ const invitation = await Invitation.create({
   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
   invitedBy: req.user.id,
 });
+const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+const invitationLink = `${frontendUrl}/accept-invitation?token=${token}`;
+
 await transporter.sendMail({
   from: process.env.EMAIL_USER,
   to: email,
   subject: "You're invited to join Team Pulse",
-  text: `You have been invited to join Team Pulse. Click this link to accept your invitation: http://localhost:5173/accept-invitation?token=${token}`,
+  text: `You have been invited to join Team Pulse. Click this link to accept your invitation: ${invitationLink}`,
 });
     res.status(201).json({
   message: "Invitation created successfully",
   invitation,
-  invitationLink: `http://localhost:5173/accept-invitation?token=${token}`,
+  invitationLink,
 });
   }
 );
