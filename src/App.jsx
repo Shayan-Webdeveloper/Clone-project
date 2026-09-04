@@ -13,8 +13,8 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const { isAuthenticated, user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const { isAuthenticated, user, selectedTeam } = useAuth();
+  const isAdmin = user?.role === "admin" || selectedTeam?.role === "admin";
 
   return (
     <Routes>
