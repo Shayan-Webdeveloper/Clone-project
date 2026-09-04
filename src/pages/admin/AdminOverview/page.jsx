@@ -5,16 +5,21 @@ import { Users, UserCheck, Mail, ListChecks, Clock } from "lucide-react";
 const API = `${import.meta.env.VITE_API_URL}/api`;
 
 function AdminOverview() {
-  const { user, token } = useAuth();
+  const { user, token, selectedTeam } = useAuth();
   const [stats, setStats] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    
     const fetchStats = async () => {
       try {
+        if (!selectedTeam?._id) {
+  setError("No team selected");
+  return;
+}
         const [employeesRes, invitationsRes, questionsRes, scheduleRes] =
           await Promise.all([
-            fetch(`${API}/employee`, {
+            fetch(`${API}/employee/${selectedTeam?._id}`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
             fetch(`${API}/invitations`, {
@@ -61,7 +66,7 @@ function AdminOverview() {
     };
 
     fetchStats();
-  }, [token]);
+  }, [token, selectedTeam]);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10">

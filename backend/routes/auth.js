@@ -49,8 +49,10 @@
      });
      router.post("/login", async (req, res) => {
      try {
-          console.log("LOGIN ROUTE STARTED");
-     const { email, password } = req.body;
+console.log("LOGIN ROUTE STARTED");
+
+const { email, password } = req.body;
+console.log("BODY RECEIVED:", email);
 
      if (!email || !password) {
           return res.status(400).json({
@@ -59,6 +61,7 @@
      }
 
      const user = await User.findOne({ email });
+     console.log("USER FOUND:", !!user);
      
      if (!user) {
           return res.status(401).json({
