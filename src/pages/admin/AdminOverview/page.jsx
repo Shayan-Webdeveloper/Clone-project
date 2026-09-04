@@ -13,13 +13,12 @@ function AdminOverview() {
     
     const fetchStats = async () => {
       try {
-        if (!selectedTeam?._id) {
-  setError("No team selected");
+        if (!selectedTeam?.teamId) {
   return;
 }
         const [employeesRes, invitationsRes, questionsRes, scheduleRes] =
           await Promise.all([
-            fetch(`${API}/employee/${selectedTeam?._id}`, {
+            fetch(`${API}/employee/${selectedTeam.teamId}`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
             fetch(`${API}/invitations`, {

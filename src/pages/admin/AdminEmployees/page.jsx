@@ -5,13 +5,13 @@ import { Users } from "lucide-react";
 const API = `${import.meta.env.VITE_API_URL}/api`;
 
 function AdminEmployees() {
-  const { token } = useAuth();
+  const { token, selectedTeam } = useAuth();
   const [employees, setEmployees] = useState(null);
   const [error, setError] = useState("");
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch(`${API}/employee`, {
+      const response = await fetch(`${API}/employee/${selectedTeam.teamId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -22,9 +22,11 @@ function AdminEmployees() {
     }
   };
 
-  useEffect(() => {
+useEffect(() => {
+  if (token && selectedTeam?.teamId) {
     fetchEmployees();
-  }, []);
+  }
+}, [token, selectedTeam?.teamId]);
 
   const toggleStatus = async (employeeId, nextActive) => {
     try {
