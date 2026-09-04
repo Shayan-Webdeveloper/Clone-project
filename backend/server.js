@@ -12,7 +12,7 @@ app.use(express.json()); // Middleware to parse incoming JSON requests and make 
 
 const PORT = process.env.PORT || 5000; // Sets the port for the server to listen on, defaulting to 5000 if not specified in environment variables.
 
-const authRoutes =  require("./routes/auth"); // Imports the authentication routes for handling user login and registration.
+const authRoutes = require("./routes/auth"); // Imports the authentication routes for handling user login and registration.
 const schedulerRoutes = require("./routes/scheduler");
 const reportRoutes = require("./routes/report");
 const employeeRoutes = require("./routes/employee"); // Imports the employee routes for handling employee-related operations.
@@ -65,4 +65,4 @@ mongoose.connect(process.env.MONGODB_URI, {
   .catch((error) => {
     console.error("MongoDB connection failed:", error.message);
   });
-  module.exports = app;
+module.exports = app;
