@@ -87,6 +87,8 @@ const runDailyStandup = async () => {
       .map((question, index) => `${index + 1}. ${question.questionText}`)
       .join("\n");
 
+    const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+
     for (const employee of activeEmployees) {
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
@@ -101,7 +103,7 @@ Today's questions:
 ${questionList}
 
 Submit your report here:
-${process.env.FRONTEND_URL}/report
+${frontendUrl}/report
 
 Regards,
 Team Pulse`,
