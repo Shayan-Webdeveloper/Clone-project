@@ -2,6 +2,7 @@
   const authMiddleware = require("../middleware/authMiddleware");
   const Team = require("../models/Team");
   const TeamMember = require("../models/TeamMember");
+  const Employee = require("../models/Employee");
   const requireTeamRole = require("../middleware/teamRoleMiddleware");
 
   const router = express.Router();
@@ -46,6 +47,11 @@
         team: team._id,
         user: req.user.id,
         role: "admin",
+      });
+
+      await Employee.create({
+        team: team._id,
+        user: req.user.id,
       });
 
       res.status(201).json({
