@@ -26,7 +26,7 @@ setError("");
             fetch(`${API}/invitations`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
-            fetch(`${API}/questions`, {
+            fetch(`${API}/questions/${selectedTeam.teamId}`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
             fetch(`${API}/settings/schedule`, {
