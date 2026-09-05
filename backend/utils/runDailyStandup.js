@@ -87,7 +87,6 @@ const runDailyStandup = async () => {
       .map((question, index) => `${index + 1}. ${question.questionText}`)
       .join("\n");
 
-    console.log("DEBUG FRONTEND_URL raw value:", JSON.stringify(process.env.FRONTEND_URL));
     const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
 
     for (const employee of activeEmployees) {
