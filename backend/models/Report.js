@@ -8,6 +8,12 @@ const reportSchema = new mongoose.Schema(
       required: true,
     },
 
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+      required: true,
+    },
+
     date: {
       type: String,
       required: true,
@@ -31,6 +37,6 @@ const reportSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-reportSchema.index({ employee: 1, date: 1 }, { unique: true });
+reportSchema.index({ employee: 1, team: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model("Report", reportSchema);

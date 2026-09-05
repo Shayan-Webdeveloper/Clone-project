@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema(
   {
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Team",
+      required: true,
+    },
+
     questionText: {
       type: String,
       required: true,

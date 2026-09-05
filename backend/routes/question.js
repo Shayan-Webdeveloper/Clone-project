@@ -1,24 +1,16 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
-const globalAdminMiddleware = require("../middleware/globalAdminMiddleware");
 const Question = require("../models/Question");
 
 const router = express.Router();
 
-router.get("/", authMiddleware, globalAdminMiddleware, async (req, res) => {
-  try {
-    const questions = await Question.find().sort({ createdAt: -1 });
-    res.json({ message: "Questions fetched successfully", questions });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Admin: list every question (active and inactive)
+// Admin: list every question for this team (active and inactive)
 router.get("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const questions = await Question.find().sort({ createdAt: -1 });
+    const questions = await Question.find({ team: req.params.teamId }).sort({
+      createdAt: -1,
+    });
 
     res.json({
       message: "Questions fetched successfully",
@@ -31,12 +23,13 @@ router.get("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
-// Any authenticated user: the questions currently asked in the daily standup
-router.get("/active", authMiddleware, async (req, res) => {
+// Any authenticated user: the questions currently asked in the daily standup for this team
+router.get("/active/:teamId", authMiddleware, async (req, res) => {
   try {
-    const questions = await Question.find({ isActive: true }).sort({
-      createdAt: 1,
-    });
+    const questions = await Question.find({
+      team: req.params.teamId,
+      isActive: true,
+    }).sort({ createdAt: 1 });
 
     res.json({
       message: "Active questions fetched successfully",
@@ -59,7 +52,10 @@ router.post("/:teamId", authMiddleware, adminMiddleware, async (req, res) => {
       });
     }
 
-    const question = await Question.create({ questionText });
+    const question = await Question.create({
+      team: req.params.teamId,
+      questionText,
+    });
 
     res.status(201).json({
       message: "Question created successfully",
@@ -80,10 +76,11 @@ router.put("/:teamId/:id", authMiddleware, adminMiddleware, async (req, res) => 
     if (questionText !== undefined) update.questionText = questionText;
     if (isActive !== undefined) update.isActive = isActive;
 
-    const question = await Question.findByIdAndUpdate(req.params.id, update, {
-      new: true,
-      runValidators: true,
-    });
+    const question = await Question.findOneAndUpdate(
+      { _id: req.params.id, team: req.params.teamId },
+      update,
+      { new: true, runValidators: true }
+    );
 
     if (!question) {
       return res.status(404).json({
@@ -104,7 +101,10 @@ router.put("/:teamId/:id", authMiddleware, adminMiddleware, async (req, res) => 
 
 router.delete("/:teamId/:id", authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const question = await Question.findByIdAndDelete(req.params.id);
+    const question = await Question.findOneAndDelete({
+      _id: req.params.id,
+      team: req.params.teamId,
+    });
 
     if (!question) {
       return res.status(404).json({

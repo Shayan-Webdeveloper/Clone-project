@@ -6,9 +6,10 @@ const Employee = require("../models/Employee");
 
 const router = express.Router();
 
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/:teamId", authMiddleware, async (req, res) => {
   try {
     const { answers } = req.body;
+    const { teamId } = req.params;
 
     if (!answers || !Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({
@@ -20,6 +21,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
     const existingReport = await Report.findOne({
       employee: req.user.id,
+      team: teamId,
       date: today,
     });
 
@@ -31,6 +33,7 @@ router.post("/", authMiddleware, async (req, res) => {
 
     const report = await Report.create({
       employee: req.user.id,
+      team: teamId,
       date: today,
       answers,
     });
@@ -70,6 +73,7 @@ router.get("/:teamId", authMiddleware, requireTeamRole("admin"), async (req, res
 
     const reports = await Report.find({
       employee: { $in: employeeIds },
+      team: teamId,
       date: { $in: dates },
     })
       .populate("employee", "name email")

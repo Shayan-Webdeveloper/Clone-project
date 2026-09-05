@@ -1,7 +1,8 @@
 const Settings = require("../models/Settings");
 const SchedulerLog = require("../models/SchedulerLog");
 const Question = require("../models/Question");
-const User = require("../models/User");
+const Team = require("../models/Team");
+const Employee = require("../models/Employee");
 const transporter = require("./sendEmail");
 
 const getScheduleTime = (date, timezone) => {
@@ -64,30 +65,36 @@ const runDailyStandup = async () => {
     return "Today's standup emails have already been sent";
   }
 
-  const questions = await Question.find({ isActive: true }).sort({
-    createdAt: 1,
-  });
+  const teams = await Team.find({ isActive: true });
+  let totalSent = 0;
 
-  if (questions.length === 0) {
-    return "No active questions found";
-  }
+  for (const team of teams) {
+    const questions = await Question.find({
+      team: team._id,
+      isActive: true,
+    }).sort({ createdAt: 1 });
 
-  const employees = await User.find({
-    role: "employee",
-    isActive: true,
-  });
-  const questionList = questions
-    .map((question, index) => `${index + 1}. ${question.questionText}`)
-    .join("\n");
+    if (questions.length === 0) continue;
 
-  for (const employee of employees) {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: employee.email,
-      subject: "Daily Standup Report",
-      text: `Hi ${employee.name},
+    const employees = await Employee.find({ team: team._id }).populate(
+      "user"
+    );
+    const activeEmployees = employees.filter((e) => e.user?.isActive);
 
-Please complete your daily standup report.
+    if (activeEmployees.length === 0) continue;
+
+    const questionList = questions
+      .map((question, index) => `${index + 1}. ${question.questionText}`)
+      .join("\n");
+
+    for (const employee of activeEmployees) {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: employee.user.email,
+        subject: `Daily Standup Report — ${team.name}`,
+        text: `Hi ${employee.user.name},
+
+Please complete your daily standup report for ${team.name}.
 
 Today's questions:
 
@@ -98,11 +105,13 @@ ${process.env.FRONTEND_URL}/report
 
 Regards,
 Team Pulse`,
-    });
+      });
+      totalSent++;
+    }
   }
 
   await SchedulerLog.create({ date: scheduleTime.date });
-  return `Standup emails sent to ${employees.length} employees`;
+  return `Standup emails sent to ${totalSent} employees across ${teams.length} teams`;
 };
 
 module.exports = runDailyStandup;
