@@ -9,6 +9,7 @@ import AdminInvite from "./pages/admin/AdminInvite/page";
 import EmployeeReport from "./pages/EmployeeReport/page";
 import AdminQuestions from "./pages/admin/AdminQuestions/page";
 import AdminSchedule from "./pages/admin/AdminSchedule/page";
+import AdminReportsPage from "./pages/admin/AdminReportsPage/page";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { useAuth } from "./context/AuthContext";
 
@@ -45,6 +46,7 @@ function App() {
             <Route path="/dashboard/invite" element={<AdminInvite />} />
             <Route path="/dashboard/questions" element={<AdminQuestions />} />
             <Route path="/dashboard/schedule" element={<AdminSchedule />} />
+            <Route path="/dashboard/reports" element={<AdminReportsPage />} />
           </>
         )}
       </Route>

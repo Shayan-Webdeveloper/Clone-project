@@ -7,6 +7,7 @@ import {
   Mail,
   ListChecks,
   Clock,
+  FileText,
   UserCircle,
   LogOut,
 } from "lucide-react";
@@ -17,6 +18,7 @@ const ADMIN_LINKS = [
   { to: "/dashboard/invite", label: "Invite", icon: Mail },
   { to: "/dashboard/questions", label: "Questions", icon: ListChecks },
   { to: "/dashboard/schedule", label: "Schedule", icon: Clock },
+  { to: "/dashboard/reports", label: "Reports", icon: FileText },
   { to: "/profile", label: "My Profile", icon: UserCircle },
 ];
 

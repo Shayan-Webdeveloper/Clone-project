@@ -11,12 +11,13 @@ function AdminOverview() {
 
   useEffect(() => {
     
-    const fetchStats = async () => {
+        const fetchStats = async () => {
       try {
         if (!selectedTeam?.teamId) {
   setError("You don't belong to any team yet. Create a team or accept an invitation to get started.");
   return;
 }
+setError("");
         const [employeesRes, invitationsRes, questionsRes, scheduleRes] =
           await Promise.all([
             fetch(`${API}/employee/${selectedTeam.teamId}`, {
