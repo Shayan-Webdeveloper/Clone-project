@@ -17,7 +17,9 @@ function AdminReportsPage() {
 
   useEffect(() => {
     const fetchReports = async () => {
+      console.log("DEBUG: fetchReports called, selectedTeam =", selectedTeam);
       if (!selectedTeam?.teamId) {
+        console.log("DEBUG: no selectedTeam.teamId, bailing out");
         setLoading(false);
         return;
       }
@@ -30,6 +32,7 @@ function AdminReportsPage() {
         );
         const data = await response.json();
         if (!response.ok) throw new Error(data.message);
+        console.log("DEBUG: API response =", data);
         setDates(data.dates || []);
         setEmployees(data.employees || []);
         setReports(data.reports || []);
