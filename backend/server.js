@@ -7,6 +7,7 @@ const cors = require("cors");          // Imports the CORS middleware to enable 
 const authMiddleware = require("./middleware/authMiddleware");  // Imports the custom authentication middleware for protecting routes.
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
+const runDailyStandup = require("./utils/runDailyStandup");
 const app = express(); // Creates an instance of the Express application.
 app.use(cors()); // Enables CORS for all routes, allowing requests from different origins.
 app.use(express.json());
@@ -68,6 +69,24 @@ if (require.main === module) {
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
+
+    let schedulerRunning = false;
+    const runScheduledStandup = async () => {
+      if (schedulerRunning) return;
+
+      schedulerRunning = true;
+      try {
+        const message = await runDailyStandup();
+        console.log(`Scheduler: ${message}`);
+      } catch (error) {
+        console.error("Automatic scheduler error:", error.message);
+      } finally {
+        schedulerRunning = false;
+      }
+    };
+
+    runScheduledStandup();
+    setInterval(runScheduledStandup, 60 * 1000);
   });
 }
 

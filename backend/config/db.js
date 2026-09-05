@@ -1,4 +1,12 @@
+const dns = require("dns");
 const mongoose = require("mongoose");
+
+dns.setServers(
+  (process.env.MONGODB_DNS_SERVERS || "1.1.1.1,8.8.8.8")
+    .split(",")
+    .map((server) => server.trim())
+    .filter(Boolean),
+);
 
 let connectionPromise = null;
 
