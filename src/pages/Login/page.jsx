@@ -44,11 +44,11 @@ setLoading(false);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+      <div className="w-full max-w-md p-8 ">
 
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-14 h-14 rounded-xl bg-indigo-600 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-xl bg-red-600 flex items-center justify-center">
             <span className="text-white text-xl font-bold">TP</span>
           </div>
         </div>
@@ -124,7 +124,7 @@ setLoading(false);
           <button
             type="submit"
              disabled={loading}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg text-white font-semibold rounded-xl transition-all duration-200 cursor-pointer"
+            className="w-full py-3 bg-red-600 hover:bg-black hover:shadow-lg text-white font-semibold rounded-xl transition-all duration-200 cursor-pointer"
           >
             {loading ? (
   <span className="flex items-center justify-center gap-2">
